@@ -15,7 +15,25 @@
         </vue-json-pretty>
       </div>
     </div>
-
+    <div class="example-box">
+      <h2 class="title">sql generator</h2>
+      <div class="block">
+        <h3>JSON Input:</h3>
+        <textarea v-model="val"></textarea>
+      </div>
+      <div class="block">
+        <h3>JSON Tree:</h3>
+        <vue-json-pretty
+          :deep="deep"
+          :data="json"
+          :path="'res'">
+        </vue-json-pretty>
+      </div>
+      <div class="block">
+        <h3>Sql Statement</h3> <br>
+        {{sqlStatement}}
+      </div>
+    </div>
     <div class="example-box">
       <h2 class="title">EXAMPLE 2</h2>
       <div class="block">
@@ -75,7 +93,7 @@
 
 <script>
 import VueJsonPretty from 'src'
-
+import {sqlGeneratorService} from 'src/services/sqlGeneratorService'; 
 export default {
   name: 'app',
   components: {
@@ -85,33 +103,35 @@ export default {
     return {
       val: '',
       data: {
-        status: 200,
-        error: '',
-        data: [{
-          news_id: 51184,
-          title: 'iPhone X Review: Innovative future with real black technology',
-          source: 'Netease phone'
-        }, {
-          news_id: 51183,
-          title: 'Traffic paradise: How to design streets for people and unmanned vehicles in the future?',
-          source: 'Netease smart'
-        }, {
-          news_id: 51182,
-          title: 'Teslamask\'s American Business Relations: The government does not pay billions to build factories',
-          source: 'AI Finance',
-          members: ['Daniel, Mike, John']
-        }]
+        SQL: {
+          select: {
+            1: {
+            column: {
+        name: "*",
+        table_ref: "*"
+        }
+        }
+        },
+        from: {
+        table: {
+        table: "apple"
+        }
+        }
+        }
       },
       selectableType: 'both',
       showLength: true,
       path: 'res',
       deep: 4,
       itemData: {},
-      itemPath: ''
+      itemPath: '',
+      sqlStatement: ''
     }
   },
   created () {
     this.val = JSON.stringify(this.data)
+    var gen = new sqlGeneratorService();
+    this.sqlStatement = gen.generateSql(this.data);
   },
   computed: {
     json () {
